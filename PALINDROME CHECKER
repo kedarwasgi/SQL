@@ -1,0 +1,80 @@
+-- PALINDROME CHECKER (Without using built-in REVERSE function)
+-- Compatible with: MySQL / MariaDB
+
+-- ---------------------------------------------------------------
+-- STEP 1: Create and populate a sample table
+-- ---------------------------------------------------------------
+
+DROP TABLE IF EXISTS words;
+
+CREATE TABLE words (
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    word VARCHAR(100)
+);
+
+INSERT INTO words (word) VALUES
+    ('racecar'),
+    ('hello'),
+    ('madam'),
+    ('world'),
+    ('level'),
+    ('python'),
+    ('noon'),
+    ('civic'),
+    ('apple'),
+    ('radar'),
+    ('12321'),
+    ('12345');
+
+
+-- ---------------------------------------------------------------
+-- STEP 2: Palindrome check using a recursive CTE
+-- Logic: Walk from both ends toward the center, comparing chars.
+--        If any mismatch is found, it's NOT a palindrome.
+-- ---------------------------------------------------------------
+
+WITH RECURSIVE palindrome_check AS (
+
+    -- Anchor: Start with left pointer at 1, right pointer at end
+    SELECT
+        id,
+        word,
+        1                    AS left_pos,
+        CHAR_LENGTH(word)    AS right_pos,
+        TRUE                 AS is_palindrome   -- assume true initially
+    FROM words
+
+    UNION ALL
+
+    -- Recursive step: Move pointers inward, compare characters
+    SELECT
+        id,
+        word,
+        left_pos  + 1,
+        right_pos - 1,
+        -- Still palindrome only if current chars match AND was palindrome so far
+        is_palindrome AND (
+            SUBSTRING(word, left_pos,  1) = SUBSTRING(word, right_pos, 1)
+        )
+    FROM palindrome_check
+    -- Continue while the two pointers haven't crossed
+    WHERE left_pos < right_pos
+
+)
+
+-- ---------------------------------------------------------------
+-- STEP 3: Pick the final result for each word (when pointers met)
+-- ---------------------------------------------------------------
+SELECT
+    id,
+    word,
+    CASE
+        WHEN is_palindrome THEN 'Yes'
+        ELSE                    'No'
+    END AS is_palindrome
+FROM palindrome_check
+-- Keep only the row where the recursion stopped (pointers crossed)
+WHERE left_pos >= right_pos
+ORDER BY id;
+
+
