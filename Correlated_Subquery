@@ -1,0 +1,13 @@
+What is a correlated subquery and how is it different from a regular subquery?
+
+A regular (non-correlated) subquery executes independently once, and its result is passed to the outer query.
+A correlated subquery references a column from the outer query, causing it to re-execute for every row
+processed by the outer query. Correlated subqueries are more flexible but potentially slower for large
+datasets — consider replacing them with window functions or JOINs for performance-critical queries.
+
+-- Correlated subquery: finds employees earning above their dept avg
+SELECT name FROM employees e
+WHERE salary > (
+SELECT AVG(salary) FROM employees
+WHERE department_id = e.department_id -- references outer 'e'
+);
