@@ -1,0 +1,18 @@
+How do you generate a sequence of dates (date range) in SQL?
+Use a recursive CTE to generate a date series, or a numbers table joined with DATEADD. In
+PostgreSQL/BigQuery, GENERATE_SERIES() provides this natively. Date ranges are essential for filling
+gaps in time-series data, building calendars, and ensuring continuous date sequences in reporting pipelines.
+
+-- PostgreSQL: generate dates for Jan 2024
+SELECT generate_series(
+'2024-01-01'::date,
+'2024-01-31'::date,
+'1 day'::interval
+)::date AS dt;
+
+-- Recursive CTE (universal)
+WITH RECURSIVE dates AS (
+SELECT '2024-01-01'::date AS dt
+UNION ALL SELECT dt + 1 FROM dates WHERE dt < '2024-01-31'
+)
+SELECT dt FROM dates;
