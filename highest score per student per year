@@ -1,0 +1,12 @@
+Get the highest score per student per year. (Deloitte USI)
+Use ROW_NUMBER() partitioned by both student name and year, ordered by score descending. Filter for rn
+= 1 to get the top-scoring row per student per year. This covers partition on multiple columns — a common
+interview pattern.
+
+WITH RankedScores AS (
+SELECT name, year, scores,
+ROW_NUMBER() OVER
+(PARTITION BY name, year ORDER BY scores DESC) AS rn
+FROM scores_table
+)
+SELECT name, year, scores FROM RankedScores WHERE rn = 1;
