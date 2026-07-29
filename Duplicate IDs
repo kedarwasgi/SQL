@@ -1,0 +1,10 @@
+Find rows with duplicate IDs where count > 1 AND value > 200. (Expedia)
+
+Use GROUP BY with HAVING using both COUNT(*) > 1 and MAX(value) > 200 conditions. This tests
+combining multiple aggregate conditions in HAVING.
+
+SELECT id
+FROM your_table
+GROUP BY id
+HAVING COUNT(*) > 1
+AND MAX(value) > 200;
